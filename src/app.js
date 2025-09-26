@@ -1,6 +1,6 @@
 import express from 'express';
-import { buscarLivroPorId } from './buscaLivro.js';
 import conectaDatabase from './config/dbConnect.js';
+import livro from './model/livro.js';
 
 const app = express();
 app.use(express.json()); // middleware para interpretar json
@@ -16,23 +16,18 @@ con.once("open",()=>{
   console.log("Conexão com o banco de dados realizada com sucesso");
 })
 
-
-
-let livros = [
-  { id: 1, titulo: "Senhor dos Aneis", autor: "J.R.R Tolkien" },
-  { id: 2, titulo: "Harry Potter", autor: "J.K Rowling" }
-];
-
+// express - rotas
 app.get('/', (req, res) => {
   res.status(200).send("Curso de Node.js");
 });
 
-app.get('/livros', (req, res) => {
-  res.status(200).json(livros);
+app.get('/livros', async (req, res) => {
+  const listaLivros = await livro.find();
+  res.status(200).json(listaLivros);
 });
 
-app.get('/livros/:id', (req, res) => {
-  const livro = buscarLivroPorId(req.params.id, livros);
+app.get('/livros/:id', async (req, res) => {
+  const livro = await livro.findById(req.params.id);
 
   if (!livro) {
     return res.status(404).json({ mensagem: "Livro não encontrado" });
@@ -78,9 +73,6 @@ app.delete('/livros/:id', (req, res) => {
 });
 
 export default app;
-
-//mongodb+srv://admin:<db_password>@cluster0.luhznay.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
 
 // TODA REQUISIÇÃO TEM QUE TER UMA RESPOSTA. SEGUE ALGUMAS:
 /*
