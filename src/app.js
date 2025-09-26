@@ -1,8 +1,22 @@
 import express from 'express';
 import { buscarLivroPorId } from './buscaLivro.js';
+import conectaDatabase from './config/dbConnect.js';
 
 const app = express();
 app.use(express.json()); // middleware para interpretar json
+
+//conexao BD
+const con = await conectaDatabase();
+
+con.on("error", (erro) => {
+  console.log("Erro na conexão com o banco de dados", erro);
+});
+
+con.once("open",()=>{
+  console.log("Conexão com o banco de dados realizada com sucesso");
+})
+
+
 
 let livros = [
   { id: 1, titulo: "Senhor dos Aneis", autor: "J.R.R Tolkien" },
@@ -65,6 +79,7 @@ app.delete('/livros/:id', (req, res) => {
 
 export default app;
 
+//mongodb+srv://admin:<db_password>@cluster0.luhznay.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
 
 // TODA REQUISIÇÃO TEM QUE TER UMA RESPOSTA. SEGUE ALGUMAS:
